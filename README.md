@@ -1,73 +1,198 @@
-# Welcome to your Lovable project
 
-## Project info
+# Weather Pulse Application
 
-**URL**: https://lovable.dev/projects/4926b73f-5092-4211-a381-469d38094b93
+A decoupled weather application featuring a React frontend (simulating Next.js) and instructions for setting up a Laravel API backend.
 
-## How can I edit this code?
+## Project Structure
 
-There are several ways of editing your application.
+This project consists of two main components:
 
-**Use Lovable**
+1. Frontend: A React application styled with Tailwind CSS
+2. Backend: Instructions for implementing a Laravel API (not included in this version)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4926b73f-5092-4211-a381-469d38094b93) and start prompting.
+## Frontend Features
 
-Changes made via Lovable will be committed automatically to this repo.
+- Display current weather for any city
+- 5-day weather forecast
+- Temperature unit toggle (Celsius/Fahrenheit)
+- Responsive design for all devices
+- Visual feedback based on weather conditions
+- Clean, modern UI with optimal UX
 
-**Use your preferred IDE**
+## Backend Implementation Instructions
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+For a complete implementation, you would need to create a Laravel backend that:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Accepts API requests for weather data
+2. Communicates with the OpenWeatherMap API
+3. Processes and returns formatted data to the frontend
 
-Follow these steps:
+### Laravel Backend Setup Steps
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. Install Laravel:
+   ```
+   composer create-project laravel/laravel weather-api
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. Create a WeatherController:
+   ```
+   php artisan make:controller WeatherController
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. Implement the controller with a method to fetch weather:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+
+class WeatherController extends Controller
+{
+    public function getWeather(Request $request)
+    {
+        $city = $request->query('city', 'London');
+        $apiKey = env('OPENWEATHERMAP_API_KEY');
+        
+        // Current weather data
+        $currentResponse = Http::get("https://api.openweathermap.org/data/2.5/weather", [
+            'q' => $city,
+            'appid' => $apiKey,
+        ]);
+        
+        if ($currentResponse->failed()) {
+            return response()->json(['error' => 'Failed to fetch weather data'], 422);
+        }
+        
+        $currentData = $currentResponse->json();
+        
+        // Forecast data
+        $forecastResponse = Http::get("https://api.openweathermap.org/data/2.5/forecast", [
+            'q' => $city,
+            'appid' => $apiKey,
+        ]);
+        
+        if ($forecastResponse->failed()) {
+            return response()->json(['error' => 'Failed to fetch forecast data'], 422);
+        }
+        
+        $forecastData = $forecastResponse->json();
+        
+        // Process forecast data to get one entry per day
+        $processedForecast = $this->processForecastData($forecastData);
+        
+        return response()->json([
+            'current' => [
+                'city' => $currentData['name'],
+                'country' => $currentData['sys']['country'],
+                'temperature' => $currentData['main']['temp'],
+                'feelsLike' => $currentData['main']['feels_like'],
+                'description' => $currentData['weather'][0]['description'],
+                'icon' => $currentData['weather'][0]['icon'],
+                'humidity' => $currentData['main']['humidity'],
+                'windSpeed' => $currentData['wind']['speed'],
+                'pressure' => $currentData['main']['pressure'],
+                'visibility' => $currentData['visibility'],
+                'sunrise' => $currentData['sys']['sunrise'],
+                'sunset' => $currentData['sys']['sunset'],
+                'timeZone' => $currentData['timezone']
+            ],
+            'forecast' => $processedForecast
+        ]);
+    }
+    
+    private function processForecastData($forecastData)
+    {
+        $processedData = [];
+        $dates = [];
+        
+        foreach ($forecastData['list'] as $forecast) {
+            $date = date('Y-m-d', $forecast['dt']);
+            
+            if (!in_array($date, $dates)) {
+                $dates[] = $date;
+                $processedData[] = [
+                    'date' => $date,
+                    'temperature' => $forecast['main']['temp'],
+                    'icon' => $forecast['weather'][0]['icon'],
+                    'description' => $forecast['weather'][0]['description']
+                ];
+            }
+            
+            // Limit to 5 days
+            if (count($dates) >= 5) {
+                break;
+            }
+        }
+        
+        return $processedData;
+    }
+}
 ```
 
-**Edit a file directly in GitHub**
+4. Set up routes in `routes/api.php`:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```php
+<?php
 
-**Use GitHub Codespaces**
+use App\Http\Controllers\WeatherController;
+use Illuminate\Support\Facades\Route;
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Route::get('/weather', [WeatherController::class, 'getWeather']);
+```
 
-## What technologies are used for this project?
+5. Add CORS middleware to allow frontend requests:
 
-This project is built with:
+```
+php artisan make:middleware Cors
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Implement the middleware:
 
-## How can I deploy this project?
+```php
+<?php
 
-Simply open [Lovable](https://lovable.dev/projects/4926b73f-5092-4211-a381-469d38094b93) and click on Share -> Publish.
+namespace App\Http\Middleware;
 
-## Can I connect a custom domain to my Lovable project?
+use Closure;
+use Illuminate\Http\Request;
 
-Yes, you can!
+class Cors
+{
+    public function handle(Request $request, Closure $next)
+    {
+        return $next($request)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            ->header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, X-Token-Auth, Authorization');
+    }
+}
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Register the middleware in `app/Http/Kernel.php`.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+6. Set up environment variables:
+
+```
+OPENWEATHERMAP_API_KEY=your_api_key_here
+```
+
+## Deployment Instructions
+
+1. Deploy the Laravel API to a server
+2. Deploy the React frontend to a hosting service
+3. Update the API URL in the frontend configuration
+4. Ensure CORS is properly configured to allow cross-domain requests
+
+## Technologies Used
+
+- React with TypeScript
+- TailwindCSS for styling
+- Laravel 10 for API backend (implementation instructions provided)
+- OpenWeatherMap API for weather data
+
+## License
+
+This project is open-sourced under the MIT license.

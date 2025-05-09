@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				weather: {
+					blue: '#33C3F0',
+					purple: '#9b87f5',
+					orange: '#F97316',
+					red: '#ea384c',
+					lightBlue: '#D3E4FD',
+					darkPurple: '#1A1F2C',
+					lightGray: '#F1F0FB'
 				}
 			},
 			borderRadius: {
@@ -84,11 +94,27 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				'pulse-slow': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.8' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.5s ease-out',
+				'pulse-slow': 'pulse-slow 3s infinite'
+			},
+			backgroundImage: {
+				'gradient-clear': 'linear-gradient(180deg, rgba(26, 31, 44, 0.8) 0%, rgba(26, 31, 44, 0.6) 100%)',
+				'gradient-cloudy': 'linear-gradient(180deg, rgba(142, 145, 150, 0.8) 0%, rgba(142, 145, 150, 0.6) 100%)',
+				'gradient-rainy': 'linear-gradient(180deg, rgba(51, 195, 240, 0.8) 0%, rgba(51, 195, 240, 0.6) 100%)',
+				'gradient-sunny': 'linear-gradient(180deg, rgba(249, 115, 22, 0.8) 0%, rgba(249, 115, 22, 0.6) 100%)'
 			}
 		}
 	},
