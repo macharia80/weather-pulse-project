@@ -29,7 +29,7 @@ const Index = () => {
       // Successful toast notification
       toast({
         title: "Weather Updated",
-        description: `Latest weather for ${data.current.city}, ${data.current.country} loaded.`,
+        description: `Latest weather for ${data.current.city} loaded.`,
       });
     } catch (error) {
       console.error('Error fetching weather:', error);
