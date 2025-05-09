@@ -7,10 +7,10 @@ export const kelvinToCelsius = (kelvin: number): number => {
 };
 
 /**
- * Converts temperature from Kelvin to Fahrenheit
+ * Converts temperature from Celsius to Fahrenheit
  */
-export const kelvinToFahrenheit = (kelvin: number): number => {
-  return Math.round((kelvin - 273.15) * 9/5 + 32);
+export const celsiusToFahrenheit = (celsius: number): number => {
+  return Math.round((celsius * 9/5) + 32);
 };
 
 /**
@@ -27,6 +27,15 @@ export const getWeatherBackground = (condition: string): string => {
   }
   else if (lowerCondition.includes('cloud') || lowerCondition.includes('overcast')) {
     return 'bg-gradient-cloudy';
+  }
+  else if (lowerCondition.includes('snow') || lowerCondition.includes('sleet') || lowerCondition.includes('hail')) {
+    return 'bg-gradient-snowy';
+  }
+  else if (lowerCondition.includes('mist') || lowerCondition.includes('fog')) {
+    return 'bg-gradient-foggy';
+  }
+  else if (lowerCondition.includes('thunder') || lowerCondition.includes('storm')) {
+    return 'bg-gradient-stormy';
   }
   
   // Default background

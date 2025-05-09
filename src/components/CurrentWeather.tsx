@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { WeatherData } from '@/api/weatherService';
-import { getWeatherIconUrl } from '@/utils/weatherUtils';
+import { getWeatherIconUrl, celsiusToFahrenheit } from '@/utils/weatherUtils';
 
 interface CurrentWeatherProps {
   data: WeatherData;
@@ -8,7 +9,15 @@ interface CurrentWeatherProps {
 }
 
 const CurrentWeather: React.FC<CurrentWeatherProps> = ({ data, tempUnit }) => {
-  const temperature = data.temperature;
+  // Convert temperature based on selected unit
+  const temperature = tempUnit === 'celsius' 
+    ? data.temperature 
+    : celsiusToFahrenheit(data.temperature);
+  
+  const feelsLike = tempUnit === 'celsius'
+    ? data.feelsLike
+    : celsiusToFahrenheit(data.feelsLike);
+    
   const tempSymbol = tempUnit === 'celsius' ? '°C' : '°F';
 
   return (
@@ -26,7 +35,7 @@ const CurrentWeather: React.FC<CurrentWeatherProps> = ({ data, tempUnit }) => {
         />
         <p className="text-xl capitalize mb-2">{data.description}</p>
         <h1 className="text-6xl font-bold">{Math.round(temperature)}{tempSymbol}</h1>
-        <p className="text-lg mt-2">Feels like: {Math.round(data.feelsLike)}{tempSymbol}</p>
+        <p className="text-lg mt-2">Feels like: {Math.round(feelsLike)}{tempSymbol}</p>
       </div>
       
       <div className="grid grid-cols-2 gap-x-8 gap-y-4 mt-8">

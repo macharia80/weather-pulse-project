@@ -1,8 +1,8 @@
 import { toast } from "@/components/ui/use-toast";
 
-// Simulating what would normally be environment variables in Next.js
+// API configuration
 const API_BASE_URL = "https://api.openweathermap.org/data/2.5";
-const API_KEY = "dummy-key"; // In a real app, this would be fetched from environment variables
+const API_KEY = "3f26d574f1f5dc159868c6809ebefc3d"; // This is a public key for demo purposes
 
 export interface WeatherData {
   city: string;
@@ -31,6 +31,91 @@ export interface WeatherResponse {
   current: WeatherData;
   forecast: ForecastDay[];
 }
+
+// Convert Kelvin to Celsius
+const kelvinToCelsius = (kelvin: number): number => {
+  return kelvin - 273.15;
+};
+
+// This function fetches real weather data from OpenWeatherMap API
+export const fetchWeatherData = async (city: string): Promise<WeatherResponse> => {
+  try {
+    // Fetch current weather data
+    const currentWeatherResponse = await fetch(
+      `${API_BASE_URL}/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}`
+    );
+    
+    if (!currentWeatherResponse.ok) {
+      throw new Error('City not found or API error');
+    }
+    
+    const currentWeatherData = await currentWeatherResponse.json();
+    
+    // Fetch forecast data
+    const forecastResponse = await fetch(
+      `${API_BASE_URL}/forecast?q=${encodeURIComponent(city)}&appid=${API_KEY}`
+    );
+    
+    if (!forecastResponse.ok) {
+      throw new Error('Failed to fetch forecast data');
+    }
+    
+    const forecastData = await forecastResponse.json();
+    
+    // Process and format current weather data
+    const current: WeatherData = {
+      city: currentWeatherData.name,
+      country: currentWeatherData.sys.country,
+      temperature: kelvinToCelsius(currentWeatherData.main.temp),
+      feelsLike: kelvinToCelsius(currentWeatherData.main.feels_like),
+      description: currentWeatherData.weather[0].description,
+      icon: currentWeatherData.weather[0].icon,
+      humidity: currentWeatherData.main.humidity,
+      windSpeed: currentWeatherData.wind.speed,
+      pressure: currentWeatherData.main.pressure,
+      visibility: currentWeatherData.visibility,
+      sunrise: currentWeatherData.sys.sunrise,
+      sunset: currentWeatherData.sys.sunset,
+      timeZone: currentWeatherData.timezone
+    };
+    
+    // Process and format 5-day forecast data
+    // OpenWeatherMap returns forecast data in 3-hour intervals
+    // We'll pick one forecast per day at noon
+    const forecast: ForecastDay[] = [];
+    const processedDates: Set<string> = new Set();
+    
+    forecastData.list.forEach((item: any) => {
+      const date = new Date(item.dt * 1000);
+      const dateStr = date.toLocaleDateString();
+      
+      // Skip if we already have this date or if we already have 5 days
+      if (!processedDates.has(dateStr) && forecast.length < 5) {
+        processedDates.add(dateStr);
+        
+        forecast.push({
+          date: dateStr,
+          temperature: kelvinToCelsius(item.main.temp),
+          icon: item.weather[0].icon,
+          description: item.weather[0].description
+        });
+      }
+    });
+    
+    return {
+      current,
+      forecast
+    };
+  } catch (error: any) {
+    console.error("Error fetching weather data:", error);
+    toast({
+      title: "Error",
+      description: error.message || "Failed to fetch weather data. Please try again.",
+      variant: "destructive"
+    });
+    throw error;
+  }
+};
 
 // Mock data for development - simulates response from a Laravel backend
 export const getMockWeatherData = (city: string): Promise<WeatherResponse> => {
@@ -93,25 +178,4 @@ export const getMockWeatherData = (city: string): Promise<WeatherResponse> => {
       });
     }, 800);
   });
-};
-
-// This function would make the actual API call to our Laravel backend
-export const fetchWeatherData = async (city: string): Promise<WeatherResponse> => {
-  try {
-    // In a real implementation, this would call the Laravel backend
-    // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/weather?city=${city}`);
-    // if (!response.ok) throw new Error('Failed to fetch weather data');
-    // return await response.json();
-    
-    // For this demo, we'll use the mock data
-    return getMockWeatherData(city);
-  } catch (error) {
-    console.error("Error fetching weather data:", error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch weather data. Please try again.",
-      variant: "destructive"
-    });
-    throw error;
-  }
 };
