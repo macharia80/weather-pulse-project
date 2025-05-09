@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { WeatherData } from '@/api/weatherService';
 import { getWeatherIconUrl } from '@/utils/weatherUtils';
