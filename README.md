@@ -196,3 +196,5 @@ OPENWEATHERMAP_API_KEY=your_api_key_here
 ## License
 
 This project is open-sourced under the MIT license.
+Project made by Macharia Sam Kamau
+
