@@ -40,16 +40,7 @@ const kelvinToCelsius = (kelvin: number): number => {
 
 // List of real cities for mock data
 const realCities = [
-  { name: "London", country: "UK" },
-  { name: "New York", country: "USA" },
-  { name: "Tokyo", country: "Japan" },
-  { name: "Paris", country: "France" },
-  { name: "Sydney", country: "Australia" },
-  { name: "Berlin", country: "Germany" },
-  { name: "Toronto", country: "Canada" },
-  { name: "Rome", country: "Italy" },
-  { name: "Madrid", country: "Spain" },
-  { name: "Dubai", country: "UAE" }
+
     { id: 1, name: 'London', country: 'GB', lat: 51.5074, lon: -0.1278 },
   { id: 2, name: 'New York', country: 'US', lat: 40.7128, lon: -74.0060 },
   { id: 3, name: 'Tokyo', country: 'JP', lat: 35.6762, lon: 139.6503 },
