@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import SearchBar from '@/components/SearchBar';
@@ -8,10 +9,16 @@ import TemperatureUnitToggle from '@/components/TemperatureUnitToggle';
 import { fetchWeatherData, WeatherResponse } from '@/api/weatherService';
 import { getWeatherBackground, getTimeBasedGreeting } from '@/utils/weatherUtils';
 
+// List of popular cities for suggestions
+const popularCities = [
+  "London", "New York", "Tokyo", "Paris", "Sydney", 
+  "Berlin", "Toronto", "Rome", "Madrid", "Dubai"
+];
+
 const Index = () => {
   const [weatherData, setWeatherData] = useState<WeatherResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [city, setCity] = useState<string>('London'); // Default city
+  const [city, setCity] = useState<string>(popularCities[0]); // Default to first popular city
   const [tempUnit, setTempUnit] = useState<'celsius' | 'fahrenheit'>('celsius');
   const { toast } = useToast();
 
@@ -28,7 +35,7 @@ const Index = () => {
       // Successful toast notification
       toast({
         title: "Weather Updated",
-        description: `Latest weather for ${data.current.city} loaded.`,
+        description: `Latest weather for ${data.current.city}, ${data.current.country} loaded.`,
       });
     } catch (error) {
       console.error('Error fetching weather:', error);
@@ -67,8 +74,20 @@ const Index = () => {
           </div>
         </header>
 
-        <div className="mb-8 w-full flex justify-center">
+        <div className="mb-8 w-full flex flex-col items-center">
           <SearchBar onSearch={handleSearch} isLoading={loading} />
+          
+          <div className="mt-4 flex flex-wrap gap-2 justify-center">
+            {popularCities.map((popularCity) => (
+              <button 
+                key={popularCity}
+                onClick={() => handleSearch(popularCity)}
+                className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm text-white transition-colors"
+              >
+                {popularCity}
+              </button>
+            ))}
+          </div>
         </div>
         
         {loading ? (

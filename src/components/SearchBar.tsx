@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Search, MapPin } from 'lucide-react';
 
 interface SearchBarProps {
   onSearch: (city: string) => void;
@@ -20,14 +20,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isLoading }) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full max-w-md gap-2">
-      <input
-        type="text"
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-        placeholder="Search city..."
-        className="flex-1 px-4 py-2 rounded-lg search-input focus:outline-none"
-        disabled={isLoading}
-      />
+      <div className="relative flex-1">
+        <MapPin size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60" />
+        <input
+          type="text"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="Search for a real city..."
+          className="w-full pl-10 pr-4 py-2 rounded-lg search-input focus:outline-none bg-white/10 text-white placeholder:text-white/60"
+          disabled={isLoading}
+        />
+      </div>
       <Button 
         type="submit" 
         disabled={isLoading} 
