@@ -77,7 +77,7 @@ export const getMockWeatherData = (city: string): Promise<WeatherResponse> => {
       resolve({
         current: {
           city,
-          country: "Country",
+          country: "Cities",
           temperature: temp,
           feelsLike: temp - 2,
           description,
