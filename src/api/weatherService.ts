@@ -50,9 +50,7 @@ const realCities = [
   { name: "Rome", country: "Italy" },
   { name: "Madrid", country: "Spain" },
   { name: "Dubai", country: "UAE" }
-  const allMegacities = [
-  // Your original 15 cities (unchanged)
-  { id: 1, name: 'London', country: 'GB', lat: 51.5074, lon: -0.1278 },
+    { id: 1, name: 'London', country: 'GB', lat: 51.5074, lon: -0.1278 },
   { id: 2, name: 'New York', country: 'US', lat: 40.7128, lon: -74.0060 },
   { id: 3, name: 'Tokyo', country: 'JP', lat: 35.6762, lon: 139.6503 },
   { id: 4, name: 'Sydney', country: 'AU', lat: -33.8688, lon: 151.2093 },
@@ -168,7 +166,7 @@ const realCities = [
   { id: 103, name: 'Porto Alegre', country: 'BR', lat: -30.0346, lon: -51.2177 },
   { id: 104, name: 'Recife', country: 'BR', lat: -8.0476, lon: -34.8770 },
   { id: 105, name: 'Fortaleza', country: 'BR', lat: -3.7319, lon: -38.5267 }
-];
+  
 ];
 
 // This function fetches real weather data from OpenWeatherMap API
